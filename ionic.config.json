@@ -1,0 +1,7 @@
+{
+  "name": "bovweight-frontend",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
