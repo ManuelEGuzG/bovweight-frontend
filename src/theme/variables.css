@@ -1,2 +1,46 @@
-/* For information on how to create your own theme, please refer to:
-http://ionicframework.com/docs/theming/ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --ion-font-family: 'Inter', sans-serif;
+
+  --bv-bg:          #0A1F1F;
+  --bv-bg-2:        #0D2B2B;
+  --bv-primary:     #00B894;
+  --bv-primary-dk:  #009B7D;
+  --bv-surface:     #ffffff;
+  --bv-text:        #0A1F1F;
+  --bv-text-2:      #4A6363;
+  --bv-text-3:      #8AABAB;
+  --bv-border:      #E8EEEE;
+
+  --ion-color-primary:           #00B894;
+  --ion-color-primary-rgb:       0,184,148;
+  --ion-color-primary-contrast:  #ffffff;
+  --ion-color-primary-shade:     #009B7D;
+  --ion-color-primary-tint:      #00CBA0;
+
+  --ion-color-success:           #00B894;
+  --ion-color-success-contrast:  #ffffff;
+  --ion-color-warning:           #F39C12;
+  --ion-color-warning-contrast:  #ffffff;
+  --ion-color-danger:            #E74C3C;
+  --ion-color-danger-contrast:   #ffffff;
+
+  --ion-background-color:        #0A1F1F;
+  --ion-text-color:              #ffffff;
+  --ion-toolbar-background:      #0D2B2B;
+  --ion-toolbar-color:           #ffffff;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes dotPulse {
+  0%, 80%, 100% { transform: scale(0.55); opacity: 0.4; }
+  40%           { transform: scale(1); opacity: 1; }
+}

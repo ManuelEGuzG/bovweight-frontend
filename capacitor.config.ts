@@ -1,9 +1,17 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'bovweight-frontend',
-  webDir: 'dist'
+  appId: 'com.bovweight.cr',
+  appName: 'BovWeight CR',
+  webDir: 'dist',
+  server: {
+    androidScheme: 'https',
+  },
+  plugins: {
+    Camera: {
+      presentationStyle: 'fullscreen',
+    },
+  },
 };
 
 export default config;
