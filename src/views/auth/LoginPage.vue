@@ -2,11 +2,10 @@
   <ion-page>
     <ion-content :fullscreen="true">
       <div class="login-container">
-        <!-- Panel izquierdo (branding) -->
-        <div class="left-panel">
+        <div class="left-panel animate-fade-in">
           <div class="brand">
             <div class="logo-icon">
-              <ion-icon :icon="leafOutline" />
+              <img src="/logo.png" alt="BovWeight CR" class="logo-img" />
             </div>
             <h1 class="brand-title">BovWeight CR</h1>
             <p class="brand-tagline">
@@ -15,19 +14,19 @@
           </div>
 
           <div class="features">
-            <div class="feature">
+            <div class="feature" style="--delay: 1">
               <div class="feature-icon">
                 <ion-icon :icon="cameraOutline" />
               </div>
               <span>Pesaje por fotografía</span>
             </div>
-            <div class="feature">
+            <div class="feature" style="--delay: 2">
               <div class="feature-icon">
                 <ion-icon :icon="medkitOutline" />
               </div>
               <span>Recetas veterinarias</span>
             </div>
-            <div class="feature">
+            <div class="feature" style="--delay: 3">
               <div class="feature-icon">
                 <ion-icon :icon="trendingUpOutline" />
               </div>
@@ -42,9 +41,8 @@
           <div class="shape shape-3" />
         </div>
 
-        <!-- Panel derecho (formulario) -->
         <div class="right-panel">
-          <div class="form-wrapper">
+          <div class="form-wrapper animate-slide-up">
             <div class="form-header">
               <h2 class="form-title">Iniciar sesión</h2>
               <p class="form-sub">Bienvenido. Ingresa tus credenciales.</p>
@@ -101,7 +99,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonPage, IonContent, IonIcon } from '@ionic/vue';
 import {
-  leafOutline, cameraOutline, medkitOutline, trendingUpOutline,
+  cameraOutline, medkitOutline, trendingUpOutline,
   mailOutline, lockClosedOutline, arrowForwardOutline,
 } from 'ionicons/icons';
 import { useAuthStore } from '@/stores/auth.store';
@@ -175,10 +173,17 @@ ion-content {
   justify-content: center;
   margin-bottom: 28px;
   backdrop-filter: blur(10px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.logo-icon ion-icon {
-  font-size: 2rem;
-  color: #00B894;
+
+.logo-icon:hover {
+  transform: rotate(5deg) scale(1.05);
+}
+
+.logo-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
 }
 
 .brand-title {
@@ -216,6 +221,15 @@ ion-content {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease forwards;
+  animation-delay: calc(var(--delay) * 0.1s);
+  opacity: 0;
+}
+
+.feature:hover {
+  transform: translateX(6px);
+  color: #00FFB7;
 }
 
 .feature-icon {
@@ -228,10 +242,23 @@ ion-content {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: all 0.3s ease;
 }
+
+.feature:hover .feature-icon {
+  background: rgba(0, 255, 183, 0.2);
+  border-color: #00FFB7;
+  box-shadow: 0 0 12px rgba(0, 255, 183, 0.2);
+}
+
 .feature-icon ion-icon {
   font-size: 1.1rem;
   color: #00B894;
+  transition: color 0.3s;
+}
+
+.feature:hover .feature-icon ion-icon {
+  color: #00FFB7;
 }
 
 .footer-uni {
@@ -240,14 +267,17 @@ ion-content {
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.35);
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
 /* Decoraciones */
 .shape {
   position: absolute;
   border-radius: 50%;
-  filter: blur(70px);
+  filter: blur(80px);
   opacity: 0.35;
+  pointer-events: none;
+  will-change: transform;
 }
 .shape-1 {
   width: 320px;
@@ -262,7 +292,7 @@ ion-content {
   background: #00FFB7;
   bottom: 80px;
   left: -60px;
-  opacity: 0.2;
+  opacity: 0.18;
 }
 .shape-3 {
   width: 280px;
@@ -270,7 +300,7 @@ ion-content {
   background: #00B894;
   bottom: -120px;
   right: 80px;
-  opacity: 0.15;
+  opacity: 0.12;
 }
 
 /* ─── Panel derecho ───────────────────────────────────────── */
@@ -303,7 +333,7 @@ ion-content {
 }
 
 .form-sub {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.45);
   margin: 0;
   font-size: 0.95rem;
 }
@@ -323,7 +353,7 @@ ion-content {
 .form-field label {
   font-size: 0.75rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.45);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -338,9 +368,9 @@ ion-content {
   position: absolute;
   left: 14px;
   font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   pointer-events: none;
-  transition: color 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-input {
@@ -353,23 +383,24 @@ ion-content {
   color: #E8F4F0;
   outline: none;
   font-family: inherit;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
 }
 
 .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.22);
 }
 
 .form-input:focus {
   border-color: #00B894;
-  background: #143838;
-  box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.1);
+  background: #123434;
+  box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.12);
 }
 
 .form-input:focus + .input-icon,
 .input-wrapper:focus-within .input-icon {
-  color: #00B894;
+  color: #00FFB7;
+  transform: scale(1.05);
 }
 
 .login-btn {
@@ -383,8 +414,8 @@ ion-content {
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.2s;
-  box-shadow: 0 6px 20px rgba(0, 184, 148, 0.3);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(0, 184, 148, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -398,20 +429,26 @@ ion-content {
 
 .login-btn ion-icon {
   font-size: 1.2rem;
-  transition: transform 0.2s;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .login-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0, 184, 148, 0.4);
+  box-shadow: 0 8px 28px rgba(0, 184, 148, 0.35);
+  filter: brightness(1.05);
 }
 
 .login-btn:hover:not(:disabled) ion-icon {
   transform: translateX(4px);
 }
 
+.login-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0, 184, 148, 0.2);
+}
+
 .login-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -431,58 +468,108 @@ ion-content {
 .dot:nth-child(2) { animation-delay: 0.2s; }
 .dot:nth-child(3) { animation-delay: 0.4s; }
 
+/* ─── Animaciones nativas CSS ─────────────────────────────── */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+.animate-slide-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes dotPulse {
   0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
   40%           { transform: scale(1);   opacity: 1; }
 }
 
-/* ─── Responsive: móvil ───────────────────────────────────── */
+/* ─── Responsive: tabletas y móviles ──────────────────────── */
+@media (max-width: 992px) {
+  .left-panel {
+    padding: 45px 35px;
+  }
+}
+
 @media (max-width: 768px) {
   .login-container {
     flex-direction: column;
   }
 
   .left-panel {
-    padding: 40px 28px 50px;
+    padding: 40px 24px 36px;
     min-height: auto;
     flex: 0 0 auto;
+    gap: 32px;
   }
 
   .logo-icon {
     width: 56px;
     height: 56px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
-  .logo-icon ion-icon { font-size: 1.7rem; }
+
+  .logo-img {
+    width: 36px;
+    height: 36px;
+  }
 
   .brand-title { font-size: 2rem; }
-  .brand-tagline { font-size: 0.9rem; }
+  .brand-tagline { font-size: 0.9rem; max-width: 100%; }
 
   .features {
     flex-direction: row;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 8px;
   }
+  
   .feature {
     flex-direction: column;
     text-align: center;
-    gap: 6px;
+    gap: 8px;
     flex: 1;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+    opacity: 1; /* Asegurar visibilidad inmediata en móvil */
+    animation: none;
   }
+  
+  .feature:hover {
+    transform: none;
+  }
+  
   .feature-icon {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
+    margin: 0 auto;
   }
 
   .footer-uni { display: none; }
 
   .right-panel {
-    padding: 32px 24px 50px;
+    padding: 40px 24px 60px;
     flex: 1;
+    align-items: flex-start; /* Evita que se centre verticalmente si despliega el teclado */
   }
 
-  .form-title { font-size: 1.6rem; }
-  .form-header { margin-bottom: 24px; }
+  .form-wrapper {
+    max-width: 100%;
+  }
+
+  .form-title { font-size: 1.75rem; }
+  .form-header { margin-bottom: 28px; }
 }
 </style>

@@ -11,11 +11,11 @@
 
     <ion-content>
       <div class="container">
-        <div class="photo-zone" :class="{ 'has-photo': photoPreview }" @click="!photoPreview && pickPhoto()">
+        <div class="photo-zone" :class="{ 'has-photo': photoPreview }" @click="!photoPreview && openPhotoOptions()">
           <img v-if="photoPreview" :src="photoPreview" class="photo-img" />
           <div v-else class="photo-placeholder">
             <div class="camera-icon"><ion-icon :icon="cameraOutline" /></div>
-            <p>Toca para seleccionar foto</p>
+            <p>Toca para tomar o seleccionar foto</p>
             <p class="sub">JPG, PNG · Máx. 10MB</p>
           </div>
         </div>
@@ -70,10 +70,17 @@
         </transition>
 
         <div class="actions">
-          <button class="action-btn primary" @click="pickPhoto">
-            <ion-icon :icon="cameraOutline" />
-            {{ photoBlob ? 'Nueva foto' : 'Seleccionar foto' }}
-          </button>
+          <!-- Botones separados: Cámara y Galería -->
+          <div class="photo-btns">
+            <button class="action-btn photo-btn" @click="openCamera">
+              <ion-icon :icon="cameraOutline" />
+              Cámara
+            </button>
+            <button class="action-btn photo-btn" @click="openGallery">
+              <ion-icon :icon="imagesOutline" />
+              Galería
+            </button>
+          </div>
 
           <transition name="fade">
             <button v-if="photoBlob && !result" class="action-btn success" :disabled="loading" @click="estimar">
@@ -111,6 +118,25 @@
         </p>
       </div>
     </ion-content>
+
+    <!-- Input oculto para galería -->
+    <input
+      ref="galleryInput"
+      type="file"
+      accept="image/*"
+      style="display:none"
+      @change="onFileSelected"
+    />
+
+    <!-- Input oculto para cámara (capture=environment = cámara trasera) -->
+    <input
+      ref="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      style="display:none"
+      @change="onFileSelected"
+    />
   </ion-page>
 </template>
 
@@ -123,7 +149,7 @@ import {
 } from '@ionic/vue';
 import {
   cameraOutline, scaleOutline, createOutline, refreshOutline,
-  pulseOutline, warningOutline, informationCircleOutline,
+  pulseOutline, warningOutline, informationCircleOutline, imagesOutline,
 } from 'ionicons/icons';
 import { historialService } from '@/services/historial.service';
 import { useToast } from '@/composables/useToast';
@@ -143,6 +169,10 @@ const angle        = ref<string>('lateral');
 const manualWeight = ref('');
 const showManual   = ref(false);
 
+// Referencias a los inputs ocultos
+const galleryInput = ref<HTMLInputElement | null>(null);
+const cameraInput  = ref<HTMLInputElement | null>(null);
+
 const angles = [
   { value: 'lateral',   label: 'Flanco' },
   { value: 'diagonal',  label: 'Diagonal' },
@@ -154,18 +184,32 @@ function angleLabel(v: string) {
   return angles.find(a => a.value === v)?.label.toLowerCase() ?? v;
 }
 
-function pickPhoto() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = (e: any) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    photoBlob.value = file;
-    photoPreview.value = URL.createObjectURL(file);
-    result.value = null;
-  };
-  input.click();
+// Abrir cámara trasera directamente
+function openCamera() {
+  result.value = null;
+  cameraInput.value?.click();
+}
+
+// Abrir galería del dispositivo
+function openGallery() {
+  result.value = null;
+  galleryInput.value?.click();
+}
+
+// Fallback: si toca la zona de foto, ofrece ambas opciones
+function openPhotoOptions() {
+  openCamera();
+}
+
+// Handler compartido para ambos inputs
+function onFileSelected(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  photoBlob.value = file;
+  photoPreview.value = URL.createObjectURL(file);
+  result.value = null;
+  // Limpiar el input para permitir seleccionar la misma foto de nuevo
+  (e.target as HTMLInputElement).value = '';
 }
 
 async function estimar() {
@@ -385,6 +429,13 @@ ion-content { --background: #071a1a; }
   display: flex; flex-direction: column; gap: 10px;
 }
 
+/* Botones de foto en fila */
+.photo-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .action-btn {
   width: 100%;
   padding: 15px;
@@ -416,6 +467,18 @@ ion-content { --background: #071a1a; }
   background: transparent;
   color: rgba(255,255,255,0.6);
   border: 1.5px solid rgba(255,255,255,0.1);
+}
+
+/* Botones de foto: cámara verde, galería outline */
+.photo-btn {
+  background: rgba(255,255,255,0.05);
+  color: #E8F4F0;
+  border: 1.5px solid rgba(0,184,148,0.3);
+}
+.photo-btn:first-child {
+  background: rgba(0,184,148,0.15);
+  border-color: #00B894;
+  color: #00B894;
 }
 
 .manual {

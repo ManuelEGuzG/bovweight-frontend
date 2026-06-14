@@ -2,7 +2,8 @@ import axios from 'axios';
 import { Preferences } from '@capacitor/preferences';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'http://192.168.0.18:8000/api/v1',
+ // const BASE_URL = 'http://192.168.86.43:8000/api/v1'; 'http://localhost:8000/api/v1';'http://192.168.0.18:8000/';
   headers: { 'Accept': 'application/json' },
 });
 
