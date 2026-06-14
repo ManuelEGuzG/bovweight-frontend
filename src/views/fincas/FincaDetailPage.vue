@@ -15,11 +15,12 @@
     </ion-header>
 
     <ion-content>
-      <div v-if="loading" class="ion-text-center ion-padding">
+      <div v-if="loading" class="ion-text-center ion-padding spinner-container">
         <ion-spinner name="crescent" color="primary" />
       </div>
 
-      <div v-else-if="finca" class="container">
+      <div v-else-if="finca" class="container animate-fade-in">
+        <!-- Tarjeta Principal (Hero) -->
         <div class="hero-card">
           <div class="hero-icon">
             <ion-icon :icon="homeOutline" />
@@ -27,41 +28,48 @@
           <div class="hero-info">
             <h1>{{ finca.nombre }}</h1>
             <p v-if="finca.ubicacion">
-              <ion-icon :icon="locationOutline" />
+              <ion-icon :icon="locationOutline" class="loc-icon" />
               {{ finca.ubicacion }}
             </p>
           </div>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-box">
-            <ion-icon :icon="leafOutline" />
-            <span class="stat-value">{{ finca.animales_count ?? 0 }}</span>
-            <span class="stat-label">Animales</span>
+        <!-- Bloque de Contenido Principal Adaptativo -->
+        <div class="main-content-layout">
+          <!-- Cuadrícula de Estadísticas -->
+          <div class="stats-grid">
+            <div class="stat-box">
+              <ion-icon :icon="leafOutline" />
+              <span class="stat-value">{{ finca.animales_count ?? 0 }}</span>
+              <span class="stat-label">Animales</span>
+            </div>
+            <div class="stat-box">
+              <ion-icon :icon="resizeOutline" />
+              <span class="stat-value">{{ finca.hectareas ?? '—' }}</span>
+              <span class="stat-label">Hectáreas</span>
+            </div>
           </div>
-          <div class="stat-box">
-            <ion-icon :icon="resizeOutline" />
-            <span class="stat-value">{{ finca.hectareas ?? '—' }}</span>
-            <span class="stat-label">Hectáreas</span>
+
+          <!-- Botones de Acción -->
+          <div class="actions">
+            <button class="action-btn primary" @click="$router.push(`/fincas/${idFinca}/animales`)">
+              <ion-icon :icon="leafOutline" />
+              <span>Ver animales</span>
+            </button>
+            <button class="action-btn" @click="$router.push(`/fincas/${idFinca}/reporte`)">
+              <ion-icon :icon="documentTextOutline" />
+              <span>Reporte de la finca</span>
+            </button>
           </div>
         </div>
 
-        <div class="actions">
-          <button class="action-btn primary" @click="$router.push(`/fincas/${idFinca}/animales`)">
-            <ion-icon :icon="leafOutline" />
-            <span>Ver animales</span>
-          </button>
-          <button class="action-btn" @click="$router.push(`/fincas/${idFinca}/reporte`)">
-            <ion-icon :icon="documentTextOutline" />
-            <span>Reporte de la finca</span>
-          </button>
-        </div>
-
+        <!-- Sección de Notas -->
         <div v-if="finca.notas" class="notes-card">
           <h3>Notas</h3>
           <p>{{ finca.notas }}</p>
         </div>
 
+        <!-- Zona de Peligro -->
         <div v-if="canDelete" class="danger-zone">
           <button class="danger-btn" @click="confirmDelete">
             <ion-icon :icon="trashOutline" />
@@ -82,23 +90,23 @@
             </ion-buttons>
           </ion-toolbar>
         </ion-header>
-        <ion-content class="ion-padding">
+        <ion-content class="ion-padding modal-form-content">
           <div v-if="editForm" class="form-wrapper">
             <div class="form-field">
               <label>Nombre *</label>
-              <input v-model="editForm.nombre" class="form-input" />
+              <input v-model="editForm.nombre" class="form-input" placeholder="Nombre de la finca" />
             </div>
             <div class="form-field">
               <label>Ubicación</label>
-              <input v-model="editForm.ubicacion" class="form-input" />
+              <input v-model="editForm.ubicacion" class="form-input" placeholder="Ubicación geográfica" />
             </div>
             <div class="form-field">
               <label>Hectáreas</label>
-              <input v-model="editForm.hectareas" type="number" step="0.01" class="form-input" />
+              <input v-model="editForm.hectareas" type="number" step="0.01" class="form-input" placeholder="0.00" />
             </div>
             <div class="form-field">
               <label>Notas</label>
-              <textarea v-model="editForm.notas" class="form-input" rows="3" />
+              <textarea v-model="editForm.notas" class="form-input form-textarea" rows="3" placeholder="Observaciones adicionales..." />
             </div>
             <button class="submit-btn" :disabled="saving" @click="handleUpdate">
               {{ saving ? 'Guardando...' : 'Guardar cambios' }}
@@ -207,194 +215,332 @@ async function handleDelete() {
 </script>
 
 <style scoped>
-ion-toolbar { --background: #0d2b2b; --color: #E8F4F0; }
+ion-toolbar { 
+  --background: #0d2b2b; 
+  --color: #E8F4F0; 
+  font-family: 'Inter', sans-serif;
+}
 ion-content { --background: #071a1a; }
 
-.container { padding: 20px 16px 100px; }
+.spinner-container {
+  padding: 60px 0;
+}
 
+.container { 
+  padding: 24px 20px 120px; 
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Tarjeta Hero Principal */
 .hero-card {
-  background: linear-gradient(135deg, #0F2E2E, #164545);
-  border: 1px solid rgba(0,184,148,0.2);
-  border-radius: 18px;
-  padding: 20px;
+  background: linear-gradient(135deg, #0F2E2E 0%, #143D3D 100%);
+  border: 1.5px solid rgba(0,184,148,0.22);
+  border-radius: 20px;
+  padding: 24px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(7, 26, 26, 0.4);
 }
 
 .hero-icon {
-  width: 60px; height: 60px;
-  background: rgba(0,184,148,0.2);
+  width: 64px; 
+  height: 64px;
+  background: rgba(0, 184, 148, 0.15);
   border-radius: 16px;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
   color: #00B894;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 184, 148, 0.2);
 }
-.hero-icon ion-icon { font-size: 1.8rem; }
+.hero-icon ion-icon { font-size: 1.9rem; }
 
 .hero-info { flex: 1; min-width: 0; }
 .hero-info h1 {
-  font-size: 1.4rem;
+  font-size: 1.55rem;
   font-weight: 800;
   color: #E8F4F0;
-  margin: 0 0 4px;
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+  font-family: 'Inter', sans-serif;
 }
 .hero-info p {
-  color: rgba(255,255,255,0.55);
-  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.88rem;
   margin: 0;
-  display: flex; align-items: center; gap: 4px;
+  display: flex; 
+  align-items: center; 
+  gap: 6px;
+  font-weight: 500;
 }
 
+.loc-icon {
+  color: #00B894;
+  font-size: 1rem;
+}
+
+/* Layout responsivo intermedio */
+.main-content-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Cuadrícula de Datos */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .stat-box {
   background: #0F2E2E;
-  border: 1px solid rgba(0,184,148,0.1);
-  border-radius: 14px;
-  padding: 16px;
+  border: 1.5px solid rgba(0,184,148,0.12);
+  border-radius: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
+  gap: 6px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stat-box:hover {
+  border-color: rgba(0,184,148,0.3);
+  transform: translateY(-2px);
 }
 
 .stat-box ion-icon {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: #00B894;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .stat-value {
-  font-size: 1.6rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: #E8F4F0;
+  letter-spacing: -0.5px;
 }
 
 .stat-label {
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.5);
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
+/* Sección de Acciones */
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .action-btn {
   width: 100%;
-  padding: 14px;
+  padding: 15px;
   background: #0F2E2E;
   border: 1.5px solid rgba(0,184,148,0.15);
   color: #E8F4F0;
   border-radius: 14px;
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 }
 
-.action-btn ion-icon { font-size: 1.2rem; color: #00B894; }
+.action-btn ion-icon { 
+  font-size: 1.25rem; 
+  color: #00B894; 
+  transition: transform 0.2s ease;
+}
+
+.action-btn:hover:not(.primary) {
+  border-color: #00B894;
+  background: #123434;
+}
+
+.action-btn:hover ion-icon {
+  transform: scale(1.1);
+}
 
 .action-btn.primary {
   background: linear-gradient(135deg, #00B894, #009B7D);
   border-color: transparent;
   color: white;
+  box-shadow: 0 4px 16px rgba(0, 184, 148, 0.2);
 }
 .action-btn.primary ion-icon { color: white; }
 
+.action-btn.primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 6px 20px rgba(0, 184, 148, 0.3);
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* Bloque de Notas */
 .notes-card {
   background: #0F2E2E;
-  border: 1px solid rgba(0,184,148,0.1);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 16px;
+  border: 1.5px solid rgba(0,184,148,0.12);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 .notes-card h3 {
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.5);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0 0 10px;
+  letter-spacing: 1.2px;
+  margin: 0 0 12px;
+  font-weight: 700;
 }
 
 .notes-card p {
   color: rgba(255,255,255,0.8);
-  font-size: 0.88rem;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  line-height: 1.6;
   margin: 0;
 }
 
+/* Zona de Peligro */
 .danger-zone {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 32px;
+  padding-top: 24px;
   border-top: 1px solid rgba(255,255,255,0.08);
 }
 
 .danger-btn {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: transparent;
-  border: 1.5px solid rgba(231,76,60,0.4);
+  border: 1.5px solid rgba(231,76,60,0.35);
   color: #E74C3C;
-  border-radius: 12px;
-  font-size: 0.88rem;
-  font-weight: 600;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   font-family: inherit;
+  transition: all 0.25s ease;
 }
 
-ion-modal { --height: 100%; --width: 100%; --border-radius: 0; --background: #071a1a; }
+.danger-btn:hover {
+  background: rgba(231,76,60,0.08);
+  border-color: #E74C3C;
+}
+
+/* Modales e Inputs Sincronizados */
+ion-modal {
+  --height: 100%; --width: 100%; --border-radius: 0;
+  --background: #071a1a;
+}
 ion-modal ion-content { --background: #071a1a; }
 ion-modal ion-toolbar { --background: #0d2b2b; --color: #E8F4F0; }
 
-@media (min-width: 768px) {
-  ion-modal { --height: 70%; --width: 500px; --border-radius: 20px; }
+.modal-form-content {
+  --padding-start: 24px;
+  --padding-end: 24px;
+  --padding-top: 16px;
 }
 
-.form-wrapper { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
-.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-wrapper { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
+.form-field { display: flex; flex-direction: column; gap: 8px; }
+
 .form-field label {
-  font-size: 0.75rem; font-weight: 600;
-  color: rgba(255,255,255,0.55);
-  text-transform: uppercase; letter-spacing: 0.8px;
+  font-size: 0.75rem; 
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase; 
+  letter-spacing: 1px;
 }
 .form-input {
   background: #0F2E2E;
-  border: 1.5px solid rgba(0,184,148,0.2);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 0.9rem;
+  border: 1.5px solid rgba(0,184,148,0.15);
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 0.95rem;
   color: #E8F4F0;
   font-family: inherit;
   outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
 }
-.form-input:focus { border-color: #00B894; }
+.form-input:focus { 
+  border-color: #00B894; 
+  background: #123434;
+  box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.1);
+}
+.form-textarea { resize: none; line-height: 1.4; }
+
 .submit-btn {
-  width: 100%; height: 48px;
+  width: 100%; 
+  height: 50px;
   background: linear-gradient(135deg, #00B894, #009B7D);
-  color: white; border: none; border-radius: 12px;
-  font-weight: 600; cursor: pointer; font-family: inherit;
-  margin-top: 8px;
+  color: white; 
+  border: none; 
+  border-radius: 14px;
+  font-weight: 700; 
+  cursor: pointer; 
+  font-family: inherit;
+  margin-top: 10px;
+  box-shadow: 0 4px 16px rgba(0, 184, 148, 0.2);
+  transition: all 0.2s ease;
 }
-.submit-btn:disabled { opacity: 0.6; }
+.submit-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 184, 148, 0.3);
+}
+.submit-btn:disabled { opacity: 0.5; box-shadow: none; }
+
+/* Animaciones */
+.animate-fade-in {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estructura Desktop */
+@media (min-width: 768px) {
+  .main-content-layout {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 16px;
+  }
+  
+  .actions {
+    justify-content: center;
+  }
+
+  ion-modal { 
+    --height: 80%; 
+    --width: 520px; 
+    --max-height: 580px;
+    --border-radius: 20px; 
+  }
+}
 </style>

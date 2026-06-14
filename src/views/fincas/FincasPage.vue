@@ -20,11 +20,11 @@
         <p class="hero-sub">{{ authStore.persona?.rol?.nombre }} · {{ fincas.length }} {{ fincas.length === 1 ? 'finca' : 'fincas' }}</p>
       </div>
 
-      <div v-if="loading" class="ion-text-center ion-padding">
+      <div v-if="loading" class="ion-text-center ion-padding spinner-container">
         <ion-spinner name="crescent" color="primary" />
       </div>
 
-      <div v-else-if="fincas.length === 0" class="empty-state">
+      <div v-else-if="fincas.length === 0" class="empty-state animate-fade-in">
         <ion-icon :icon="homeOutline" />
         <h3>No tienes fincas</h3>
         <p v-if="authStore.canCreateFincas">Crea tu primera finca con el botón +</p>
@@ -33,9 +33,10 @@
 
       <div v-else class="fincas-grid">
         <div
-          v-for="finca in fincas"
+          v-for="(finca, index) in fincas"
           :key="finca.id_finca"
-          class="finca-card"
+          class="finca-card animate-card"
+          :style="{ '--delay': index + 1 }"
           @click="$router.push(`/fincas/${finca.id_finca}`)"
         >
           <div class="card-icon">
@@ -44,7 +45,7 @@
           <div class="card-info">
             <h3>{{ finca.nombre }}</h3>
             <p v-if="finca.ubicacion">
-              <ion-icon :icon="locationOutline" />
+              <ion-icon :icon="locationOutline" class="loc-icon" />
               {{ finca.ubicacion }}
             </p>
             <div class="card-stats">
@@ -62,7 +63,6 @@
         </div>
       </div>
 
-      <!-- Modal nueva finca -->
       <ion-modal :is-open="showForm" @did-dismiss="resetForm">
         <ion-header>
           <ion-toolbar>
@@ -74,7 +74,7 @@
             </ion-buttons>
           </ion-toolbar>
         </ion-header>
-        <ion-content class="ion-padding">
+        <ion-content class="ion-padding modal-form-content">
           <div class="form-wrapper">
             <div class="form-field">
               <label>Nombre *</label>
@@ -90,7 +90,7 @@
             </div>
             <div class="form-field">
               <label>Notas</label>
-              <textarea v-model="form.notas" class="form-input" rows="3" />
+              <textarea v-model="form.notas" class="form-input form-textarea" rows="3" placeholder="Detalles opcionales de la finca..." />
             </div>
             <button class="submit-btn" :disabled="saving" @click="handleCreate">
               {{ saving ? 'Creando...' : 'Crear Finca' }}
@@ -189,175 +189,316 @@ async function handleLogout() {
 </script>
 
 <style scoped>
-ion-toolbar { --background: #0d2b2b; --color: #E8F4F0; }
+ion-toolbar { 
+  --background: #0d2b2b; 
+  --color: #E8F4F0; 
+  font-family: 'Inter', sans-serif;
+}
 ion-content { --background: #071a1a; }
 
 .hero {
-  padding: 24px 20px 16px;
+  padding: 32px 24px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .hero-title {
-  font-size: 1.6rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: #E8F4F0;
   margin: 0;
   letter-spacing: -0.5px;
+  font-family: 'Inter', sans-serif;
 }
 
 .hero-sub {
   color: rgba(255,255,255,0.45);
-  font-size: 0.85rem;
-  margin: 4px 0 0;
+  font-size: 0.9rem;
+  margin: 6px 0 0;
+  font-weight: 500;
+}
+
+.spinner-container {
+  padding: 60px 0;
 }
 
 .empty-state {
   text-align: center;
-  padding: 80px 32px;
+  padding: 100px 32px;
   color: rgba(255,255,255,0.4);
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .empty-state ion-icon {
-  font-size: 4rem;
-  opacity: 0.3;
-  margin-bottom: 16px;
+  font-size: 4.5rem;
+  color: #00B894;
+  opacity: 0.25;
+  margin-bottom: 20px;
 }
 
 .empty-state h3 {
-  color: rgba(255,255,255,0.7);
-  font-weight: 600;
+  color: #E8F4F0;
+  font-weight: 700;
+  font-size: 1.2rem;
   margin: 0 0 8px;
 }
 
-.empty-state p { font-size: 0.9rem; margin: 0; }
+.empty-state p { 
+  font-size: 0.92rem; 
+  line-height: 1.5;
+  color: rgba(255,255,255,0.45); 
+}
 
+/* Rejilla de Fincas Mejorada */
 .fincas-grid {
-  padding: 0 16px 100px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  padding: 0 24px 120px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .finca-card {
   background: #0F2E2E;
-  border: 1px solid rgba(0,184,148,0.1);
+  border: 1.5px solid rgba(0,184,148,0.12);
   border-radius: 16px;
-  padding: 18px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.2s;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-card {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: calc(var(--delay) * 0.08s);
 }
 
 .finca-card:hover {
-  border-color: rgba(0,184,148,0.4);
-  transform: translateY(-2px);
+  border-color: #00B894;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 184, 148, 0.12);
 }
 
 .card-icon {
-  width: 52px; height: 52px;
-  background: rgba(0,184,148,0.15);
+  width: 56px; 
+  height: 56px;
+  background: rgba(0, 184, 148, 0.12);
   border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
   color: #00B894;
   flex-shrink: 0;
+  transition: all 0.25s ease;
 }
-.card-icon ion-icon { font-size: 1.6rem; }
+
+.finca-card:hover .card-icon {
+  background: rgba(0, 255, 183, 0.18);
+  color: #00FFB7;
+  transform: scale(1.02);
+}
+
+.card-icon ion-icon { font-size: 1.65rem; }
 
 .card-info { flex: 1; min-width: 0; }
+
 .card-info h3 {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #E8F4F0;
-  margin: 0 0 4px;
+  margin: 0 0 6px;
+  letter-spacing: -0.2px;
 }
+
 .card-info p {
-  font-size: 0.82rem;
-  color: rgba(255,255,255,0.5);
-  margin: 0 0 8px;
-  display: flex; align-items: center; gap: 4px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.45);
+  margin: 0 0 10px;
+  display: flex; 
+  align-items: center; 
+  gap: 5px;
 }
-.card-info p ion-icon { font-size: 0.9rem; }
+
+.loc-icon { 
+  font-size: 0.95rem; 
+  color: rgba(0, 184, 148, 0.7);
+}
 
 .card-stats {
   display: flex;
-  gap: 14px;
+  gap: 16px;
 }
 
 .stat {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: rgba(255,255,255,0.6);
-  display: flex; align-items: center; gap: 4px;
+  display: flex; 
+  align-items: center; 
+  gap: 5px;
+  font-weight: 500;
 }
+
 .stat ion-icon {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #00B894;
 }
 
 .card-chevron {
-  color: rgba(255,255,255,0.3);
-  font-size: 1.2rem;
+  color: rgba(255,255,255,0.25);
+  font-size: 1.25rem;
+  margin-left: 4px;
   flex-shrink: 0;
+  transition: transform 0.25s;
 }
 
-/* Modal */
+.finca-card:hover .card-chevron {
+  transform: translateX(3px);
+  color: #00FFB7;
+}
+
+/* Modal Estilizado */
 ion-modal {
-  --height: 100%; --width: 100%; --border-radius: 0;
+  --height: 100%; 
+  --width: 100%; 
+  --border-radius: 0;
   --background: #071a1a;
 }
 ion-modal ion-content { --background: #071a1a; --color: #E8F4F0; }
 ion-modal ion-toolbar { --background: #0d2b2b; --color: #E8F4F0; }
 
-@media (min-width: 768px) {
-  ion-modal {
-    --height: 70%; --width: 500px;
-    --max-height: 600px; --border-radius: 20px;
-  }
+.modal-form-content {
+  --padding-start: 24px;
+  --padding-end: 24px;
+  --padding-top: 16px;
 }
 
 .form-wrapper {
-  display: flex; flex-direction: column; gap: 16px;
-  padding-top: 8px;
+  display: flex; 
+  flex-direction: column; 
+  gap: 18px;
 }
 
-.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+}
 
 .form-field label {
   font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.55);
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
 }
 
 .form-input {
   background: #0F2E2E;
-  border: 1.5px solid rgba(0,184,148,0.2);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 0.9rem;
+  border: 1.5px solid rgba(0,184,148,0.15);
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 0.95rem;
   color: #E8F4F0;
   font-family: inherit;
   outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+.form-input::placeholder {
+  color: rgba(255,255,255,0.25);
 }
 
 .form-input:focus {
   border-color: #00B894;
+  background: #123434;
+  box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.1);
+}
+
+.form-textarea {
+  resize: none;
+  line-height: 1.4;
 }
 
 .submit-btn {
   width: 100%;
-  height: 48px;
+  height: 50px;
   background: linear-gradient(135deg, #00B894, #009B7D);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 10px;
   font-family: inherit;
+  box-shadow: 0 4px 16px rgba(0, 184, 148, 0.2);
+  transition: all 0.2s ease;
 }
 
-.submit-btn:disabled { opacity: 0.6; }
+.submit-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 184, 148, 0.3);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Animaciones */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Media Queries para Responsividad Superior ──────────────── */
+@media (min-width: 576px) {
+  .fincas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  ion-modal {
+    --height: 80%; 
+    --width: 520px;
+    --max-height: 580px; 
+    --border-radius: 20px;
+  }
+}
+
+@media (min-width: 992px) {
+  .fincas-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
 </style>
